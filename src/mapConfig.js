@@ -11,8 +11,8 @@ module.exports = {
     options: {
       grids: [{
         zoom: 14,
-        tilesPerDirection: 6,
-        cullZoom: 8
+        tilesPerDirection: 10,
+        cullZoom: 10
       }]
     }
   },

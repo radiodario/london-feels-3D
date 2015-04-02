@@ -23,6 +23,7 @@ var BlueprintOutputSentimentTweets = function(options) {
 
   self.world;
 
+  self.tweets = [];
 
 }
 
@@ -45,12 +46,14 @@ BlueprintOutputSentimentTweets.prototype.init = function() {
 BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
   var self = this;
 
-  var col = self.color(tweet.sentiment.score);
 
-  var colHex = parseInt(col, 16);
+  var col = parseInt(self.color(tweet.sentiment.score).replace('#', '0x'), 16);
+
+
 
   var material = new THREE.MeshBasicMaterial({
     color: col,
+    // color: 0xff0000,
     // vertexColors: THREE.VertexColors,
     // ambient: 0xffffff,
     // emissive: 0xcccccc,
@@ -74,7 +77,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
   var height = 100;
 
-  var mesh = new THREE.Mesh(barGeom);
+  var mesh = new THREE.Mesh(barGeom, material);
   mesh.scale.y = height;
 
   // offset
@@ -84,8 +87,30 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
   mesh.matrixAutoUpdate && mesh.updateMatrix();
 
 
-  self.add(mesh);
 
+  // debugger;
+  self.add(mesh);
+  // self.world.addPickable(mesh, tweet.id);
+  tweet.mesh = mesh;
+  // remove the object in 5 seconds
+  self.tweets.push(tweet);
+
+
+}
+
+BlueprintOutputSentimentTweets.prototype.onTick = function() {
+  var self = this;
+  var i, l, tw;
+  if (self.tweets.length > 0) {
+    for (var l = self.tweets.length, i = l - 1; i > 0; i--) {
+      tw = self.tweets[i];
+      tw.mesh.scale.y *= 0.9998;
+      if (tw.mesh.scale.y < 1) {
+        self.remove(tw.mesh);
+        self.tweets.splice(i, 1);
+      }
+    }
+  }
 }
 
 

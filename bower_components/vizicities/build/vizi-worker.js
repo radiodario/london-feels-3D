@@ -1,4 +1,4 @@
-/*! ViziCities - v0.2.0 - 2014-11-02 */
+/*! ViziCities - v0.2.0 - 2015-03-30 */
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -6341,6 +6341,8 @@ if (typeof window === undefined) {
   VIZI.CRS = {
     code: undefined,
     tileSize: 256,
+    projection: undefined,
+    inverseProjection: undefined,
 
     // Project WGS84 coordinates into pixel positions
     // TODO: Project non-EPSG:3857 CRS into EPSG:3857 for pixel coords
@@ -6490,16 +6492,29 @@ if (typeof window === undefined) {
       return new VIZI.Point(tile.x, (Math.pow(2, zoom) - 1) - tile.y);
     },
 
+    setProjection: function(code) {
+      var self = this;
+      if (code === undefined) {
+        code = self.code;
+      }
+      if (!self.projection || code !== self.code) {
+        self.projection = new proj4.Proj(self.code);
+        self.inverseProjection = proj4(self.projection).inverse;
+      }
+    },
+
     // Convert WGS84 coordinates into CRS
     project: function(latLon) {
       var self = this;
-      return proj4(self.code, [latLon.lon, latLon.lat]);
+      self.setProjection();
+      return proj4(self.projection, [latLon.lon, latLon.lat]);
     },
 
     // Convert CRS into WGS84 coordinates
     unproject: function(point) {
       var self = this;
-      return proj4(self.code).inverse([point.x, point.y]);
+      self.setProjection();
+      return self.inverseProjection([point.x, point.y]);
     },
 
     // Map resolution (meters per pixel) for a given zoom
@@ -6586,7 +6601,10 @@ if (typeof window === undefined) {
       // var zoom = Math.floor(19 - Math.log(altitude / 1000) / Math.LN2);
 
       // https://social.msdn.microsoft.com/Forums/en-US/5454d549-5eeb-43a5-b188-63121d3f0cc1/how-to-set-zoomlevel-for-particular-altitude?forum=bingmaps
-      var zoom = 19 - Math.log2(altitude * 0.05);
+      // TODO: Use Math.log2 with a shim
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log2#Polyfill
+      // var zoom = 19 - Math.log2(altitude * 0.05);
+      var zoom = 19 - (Math.log(altitude * 0.05) / Math.LN2);
 
       // http://stackoverflow.com/a/13159839
       // var scale = altitude / 500;
@@ -6657,45 +6675,36 @@ if (typeof window === undefined) {
   VIZI.Point = function(x, y, z) {
     var self = this;
 
-    self.x = x || 0;
-    self.y = y || 0;
-    self.z = z || 0;
+    THREE.Vector3.call(self, x, y, z);
 
-    // Copy if already a VIZI.Point instance
-    if (x instanceof VIZI.Point) {
-      self.x = x.x;
-      self.y = x.y;
-      self.z = x.z;
-    } else if (_.isArray(x)) {
-      self.x = x[0];
-      self.y = x[1];
-      self.z = x[2] || 0;
-    }
+    // TODO: Reimplement the following backups if needed
+    // self.x = x || 0;
+    // self.y = y || 0;
+    // self.z = z || 0;
+
+    // // Copy if already a VIZI.Point instance
+    // if (x instanceof VIZI.Point) {
+    //   self.x = x.x;
+    //   self.y = x.y;
+    //   self.z = x.z;
+    // } else if (_.isArray(x)) {
+    //   self.x = x[0];
+    //   self.y = x[1];
+    //   self.z = x[2] || 0;
+    // }
   };
 
-  // Creates a copy
-  VIZI.Point.prototype.add = function(point) {
+  VIZI.Point.prototype = Object.create( THREE.Vector3.prototype );
+
+  // Override clone so it returns VIZI.Point not THREE.Vector3
+  VIZI.Point.prototype.clone = function(point) {
     var self = this;
-
-    var add = new VIZI.Point(
-      self.x + point.x,
-      self.y + point.y,
-      self.z + point.z
-    );
-
-    return add;
+    return new VIZI.Point(self.x, self.y, self.z);
   };
 
-  // Creates a copy
+  // Proxy of sub
   VIZI.Point.prototype.subtract = function(point) {
     var self = this;
-
-    var subtract = new VIZI.Point(
-      self.x - point.x,
-      self.y - point.y,
-      self.z - point.z
-    );
-
-    return subtract;
+    return self.sub(point);
   };
 })();

@@ -2,11 +2,16 @@
 VIZI.BlueprintInputGeoTweets = require('./BlueprintInputGeoTweets');
 VIZI.BlueprintOutputSentimentTweets = require('./BlueprintOutputSentimentTweets');
 
-var world = new VIZI.World({
+
+var worldOptions = {
   viewport: document.querySelector("#map-viewport"),
   center: new VIZI.LatLon(51.502, -0.08),
-  zoom: 14
-});
+  zoom: 14,
+  picking: true,
+  antialias: true
+};
+
+var world = new VIZI.World(worldOptions);
 
 var controls = new VIZI.ControlsMap(world.camera, {
   viewport: world.options.viewport
