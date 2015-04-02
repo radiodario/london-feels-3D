@@ -6,7 +6,7 @@ module.exports = {
     }
   },
   output: {
-    type: "BlueprintOutputDebugPoints",
+    type: "BlueprintOutputSentimentTweets",
     options: {}
   },
   triggers: [
@@ -22,19 +22,12 @@ module.exports = {
     {
       triggerObject: "input",
       triggerName: "tweetReceived",
-      triggerArguments: ['tweets'],
+      triggerArguments: ['tweet'],
       actionObject: "output",
-      actionName: "outputPoints",
-      actionArguments: ['data'],
+      actionName: "outputTweet",
+      actionArguments: ['tweet'],
       actionOutput: {
-        data: {
-          process: "map",
-          itemsObject: "tweets",
-          itemsProperties: "tweets",
-          transformation: {
-            coordinates: "coordinates.coordinates"
-          }
-        }
+        tweet: "tweet"
       }
     }
   ]

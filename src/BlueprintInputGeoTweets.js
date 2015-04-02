@@ -30,7 +30,7 @@ BlueprintInputGeoTweets.prototype.init = function() {
   this.socket = io(self.options.path);
   this.socket.on('tweet', function(tweet) {
     if (VIZI.DEBUG) console.log("tweet received", tweets);
-    self.emit("tweetReceived", {tweets: [tweet]});
+    self.emit("tweetReceived", tweet);
   });
 
   self.emit("initialised");
@@ -46,18 +46,16 @@ BlueprintInputGeoTweets.prototype.requestLatestTweets = function() {
       return;
     }
 
-    self.emit("tweetReceived", {tweets:tweets});
+    if (VIZI.DEBUG) console.log("loaded", tweets.length, "tweets");
 
-    // if (VIZI.DEBUG) console.log("loaded", tweets.length, "tweets");
+    // stagger the tweets one every 50 ms
+    var i = 0;
+    d3.timer(function(d) {
+      self.emit("tweetReceived", tweets[i]);
 
-    // // stagger the tweets one every 50 ms
-    // var i = 0;
-    // d3.timer(function(d) {
-    //   self.emit("tweetReceived", tweets[i]);
+      return !(++i < tweets.length);
 
-    //   return !(++i < tweets.length);
-
-    // }, 50)
+    }, 50);
 
   })
 };

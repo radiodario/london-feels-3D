@@ -1,10 +1,11 @@
 // setup our blueprint input
 VIZI.BlueprintInputGeoTweets = require('./BlueprintInputGeoTweets');
-
+VIZI.BlueprintOutputSentimentTweets = require('./BlueprintOutputSentimentTweets');
 
 var world = new VIZI.World({
   viewport: document.querySelector("#map-viewport"),
-  center: new VIZI.LatLon(51.50358, -0.01924)
+  center: new VIZI.LatLon(51.502, -0.08),
+  zoom: 14
 });
 
 var controls = new VIZI.ControlsMap(world.camera, {
