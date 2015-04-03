@@ -22,7 +22,8 @@ var BlueprintOutputSentimentTweets = function(options) {
   self.name = self.options.name;
 
   self.world;
-
+  self.pickedMesh;
+  self.lastPickedIdClick;
   self.tweets = [];
 
 }
@@ -60,7 +61,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
     shading: THREE.FlatShading
   });
 
-  var barGeom = new THREE.BoxGeometry( 10, 1, 10 );
+  var barGeom = new THREE.BoxGeometry( 5, 1, 5 );
 
   // Shift each vertex by half the bar height
   // This means it will scale from the bottom rather than the centre
@@ -89,12 +90,58 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
 
   // debugger;
-  self.add(mesh);
-  // self.world.addPickable(mesh, tweet.id);
+  self.world.addPickable(mesh, tweet.id_str);
+
   tweet.mesh = mesh;
   // remove the object in 5 seconds
   self.tweets.push(tweet);
 
+  VIZI.Messenger.on("pick-hover:" + tweet.id_str, function() {
+    if (self.hidden) {
+      return;
+    }
+
+    console.log("pick-hover:" + tweet.id_str)
+
+    if (self.pickedMesh) {
+      self.remove(self.pickedMesh);
+    }
+
+    var geomCopy = barGeom.clone();
+
+    self.pickedMesh = new THREE.Mesh(geomCopy, new THREE.MeshBasicMaterial({
+      color: 0xffff22,
+      shading: THREE.FlatShading,
+      wireframe: true,
+      wireframeLinewidth: 3
+    }));
+
+    self.pickedMesh.position.copy(mesh.position)
+    self.pickedMesh.rotation.copy(mesh.rotation);
+    self.pickedMesh.scale.copy(mesh.scale);
+    self.pickedMesh.scale.x *= 1.01;
+    self.pickedMesh.scale.y *= 1.01;
+    self.pickedMesh.scale.z *= 1.01;
+    self.pickedMesh.renderDepth = -1.1 * self.options.layer;
+
+    self.pickedMesh.matrixAutoUpdate && self.pickedMesh.updateMatrix();
+
+    self.add(self.pickedMesh);
+  });
+
+  VIZI.Messenger.on("pick-off:" + tweet.id_str, function() {
+    if (self.pickedMesh) {
+      self.remove(self.pickedMesh);
+    }
+  });
+
+
+  VIZI.Messenger.on("pick-click:" + tweet.id_str, function() {
+    console.log("clicked: " + tweet.id_str)
+  });
+
+
+  self.add(mesh);
 
 }
 
@@ -105,8 +152,11 @@ BlueprintOutputSentimentTweets.prototype.onTick = function() {
     for (var l = self.tweets.length, i = l - 1; i > 0; i--) {
       tw = self.tweets[i];
       tw.mesh.scale.y *= 0.9998;
+      // tw.mesh.scale.z *= 0.9998;
+      // tw.mesh.scale.x *= 0.9998;
       if (tw.mesh.scale.y < 1) {
         self.remove(tw.mesh);
+        self.world.removePickable(tw.mesh, tw.id_str);
         self.tweets.splice(i, 1);
       }
     }

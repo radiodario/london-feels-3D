@@ -8,13 +8,17 @@ var worldOptions = {
   center: new VIZI.LatLon(51.502, -0.08),
   zoom: 14,
   picking: true,
-  antialias: true
+  antialias: false
 };
 
 var world = new VIZI.World(worldOptions);
 
 var controls = new VIZI.ControlsMap(world.camera, {
   viewport: world.options.viewport
+});
+
+var pickControls = new VIZI.ControlsMousePick(world.camera, {
+  scene: world.scene
 });
 
 var mapConfig = require('./mapConfig');
