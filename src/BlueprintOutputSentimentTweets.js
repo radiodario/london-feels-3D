@@ -39,7 +39,11 @@ BlueprintOutputSentimentTweets.prototype.init = function() {
    .range(["rgb(253,88,6)", "rgb(44,163,219)"])
    .interpolate(d3.interpolateHcl);
 
-  self.emit("initialised");
+  var loader = new THREE.JSONLoader();
+  loader.load('data/tweet.json', function(geometry, materials) {
+    self.geometry = geometry;
+    self.emit("initialised");
+  });
 
 };
 
@@ -76,10 +80,16 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
   var geoCoord = self.world.project(new VIZI.LatLon(coords[1], coords[0]));
 
-  var height = 100;
+  var height = 2.5;
 
-  var mesh = new THREE.Mesh(barGeom, material);
+  var mesh = new THREE.Mesh(self.geometry, material);
+  mesh.scale.x = height;
   mesh.scale.y = height;
+  mesh.scale.z = height;
+
+  // mesh.rotation.x = Math.PI / 2;
+
+  mesh.position.y = 10;
 
   // offset
   mesh.position.x = geoCoord.x;
@@ -89,7 +99,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
 
 
-  // debugger;
+  debugger;
   self.world.addPickable(mesh, tweet.id_str);
 
   tweet.mesh = mesh;
@@ -107,7 +117,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
       self.remove(self.pickedMesh);
     }
 
-    var geomCopy = barGeom.clone();
+    var geomCopy = self.geometry.clone();
 
     self.pickedMesh = new THREE.Mesh(geomCopy, new THREE.MeshBasicMaterial({
       color: 0xffff22,
@@ -151,14 +161,17 @@ BlueprintOutputSentimentTweets.prototype.onTick = function() {
   if (self.tweets.length > 0) {
     for (var l = self.tweets.length, i = l - 1; i > 0; i--) {
       tw = self.tweets[i];
-      tw.mesh.scale.y *= 0.9998;
-      // tw.mesh.scale.z *= 0.9998;
-      // tw.mesh.scale.x *= 0.9998;
-      if (tw.mesh.scale.y < 1) {
-        self.remove(tw.mesh);
-        self.world.removePickable(tw.mesh, tw.id_str);
-        self.tweets.splice(i, 1);
-      }
+
+      tw.mesh.lookAt(self.world.camera.camera.position);
+
+      // tw.mesh.scale.y *= 0.9998;
+      // // tw.mesh.scale.z *= 0.9998;
+      // // tw.mesh.scale.x *= 0.9998;
+      // if (tw.mesh.scale.y < 1) {
+      //   self.remove(tw.mesh);
+      //   self.world.removePickable(tw.mesh, tw.id_str);
+      //   self.tweets.splice(i, 1);
+      // }
     }
   }
 }
