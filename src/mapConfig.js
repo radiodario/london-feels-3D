@@ -3,7 +3,8 @@ module.exports = {
     type: "BlueprintInputMapTiles",
     options: {
       // tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
-      tilePath: "//stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
+      tilePath: "//stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+      name: "Map Tiles"
     }
   },
   output: {
