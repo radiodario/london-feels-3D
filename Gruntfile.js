@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
     copy: {
       all: {
-        src: ['*.css', '*.html', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'bower_components/**/*.{js,css}'],
+        src: ['*.css', '*.html', 'images/**/*', 'data/**/*.json', 'img/**/*', '!Gruntfile.js', 'bower_components/**/*.{js,css}'],
         dest: 'dist/',
       },
     },
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
       },
 
       assets: {
-        files: ['assets/**/*', '*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js'],
+        files: ['assets/**/*', '*.css', 'images/**/*', 'data/**/*.json', 'img/**/*', '!Gruntfile.js'],
         tasks: ['copy'],
       }
     },
