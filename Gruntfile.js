@@ -24,11 +24,11 @@ module.exports = function(grunt) {
 
     browserify: {
       all: {
-        src: 'src/**/*.js',
+        src: ['src/**/*.js'],
         dest: 'dist/app.js'
       },
       options: {
-        transform: ['debowerify']
+        transform: ['reactify','debowerify']
       }
     },
 

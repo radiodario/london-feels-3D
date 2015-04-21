@@ -7,7 +7,9 @@ module.exports = {
   },
   output: {
     type: "BlueprintOutputSentimentTweets",
-    options: {}
+    options: {
+      infoUI: true,
+    }
   },
   triggers: [
     {
