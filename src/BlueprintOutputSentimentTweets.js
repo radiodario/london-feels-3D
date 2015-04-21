@@ -2,6 +2,8 @@ var _ = require('underscore');
 var d3 = require('d3');
 var InfoUI = require('./TweetUI');
 
+var MAX_AGE = 5 * 60000; // 5 minutes;
+
 var BlueprintOutputSentimentTweets = function(options) {
   var self = this;
 
@@ -137,7 +139,8 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
   self.world.addPickable(circleMesh, tweet.id_str);
 
-  tweet.circle = mesh;
+  tweet.circle = circleMesh;
+  tweet.edge = circleEdge;
   tweet.mesh = mesh;
   tweet.spawnedAt = new Date().getTime();
   // add a times bounced counter
@@ -226,10 +229,14 @@ BlueprintOutputSentimentTweets.prototype.onTick = function() {
 
       // remove the ones aged more than 5 minutes;
       // XXX Make this a constant / configurable;
-      if (elapsed > (1000 * 60 * 60 * 5)) {
+      if (elapsed > MAX_AGE) {
         self.remove(tw.mesh);
-        self.world.removePickable(tw.mesh, tw.id_str);
+        self.remove(tw.circle);
+        self.remove(tw.edge);
+        // XXX pickable not removable?
+        // self.world.removePickable(tw.circle, tw.id_str);
         self.tweets.splice(i, 1);
+        console.log('removed', tw.id_str);
         continue;
       }
 
