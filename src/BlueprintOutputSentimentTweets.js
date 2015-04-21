@@ -2,7 +2,7 @@ var _ = require('underscore');
 var d3 = require('d3');
 var InfoUI = require('./TweetUI');
 
-var MAX_AGE = 5 * 60000; // 5 minutes;
+var MAX_AGE = 1 * 60000; // 5 minutes;
 
 var BlueprintOutputSentimentTweets = function(options) {
   var self = this;
@@ -212,7 +212,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
 
 BlueprintOutputSentimentTweets.prototype.onTick = function() {
   var self = this;
-  var i, l, tw, elapsed, angle;
+  var i, l, tw, elapsed, tweetAge, angle;
 
   var t = new Date().getTime();
 
@@ -226,10 +226,10 @@ BlueprintOutputSentimentTweets.prototype.onTick = function() {
       tw = self.tweets[i];
 
       elapsed = t - tw.spawnedAt;
-
+      tweetAge = t - new Date(tw.created_at).getTime();
       // remove the ones aged more than 5 minutes;
       // XXX Make this a constant / configurable;
-      if (elapsed > MAX_AGE) {
+      if (tweetAge > MAX_AGE) {
         self.remove(tw.mesh);
         self.remove(tw.circle);
         self.remove(tw.edge);
