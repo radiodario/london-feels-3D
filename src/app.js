@@ -17,6 +17,10 @@ var controls = new VIZI.ControlsMap(world.camera, {
   viewport: world.options.viewport
 });
 
+// var firstPerson = new VIZI.ControlsFirstPerson(world.camera, {
+//   viewport: world.options.viewport
+// });
+
 var pickControls = new VIZI.ControlsMousePick(world.camera, {
   scene: world.scene
 });

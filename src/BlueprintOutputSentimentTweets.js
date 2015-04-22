@@ -184,7 +184,7 @@ BlueprintOutputSentimentTweets.prototype.outputTweet = function(tweet) {
         lastPickedTweet = self.infoUI.panels[self.lastPickedIdClick].tweet;
         lastPickedTweet.picked = false;
         lastPickedTweet.mesh.material = material;
-        lastPickedTweet.circleMesh.material = circleMaterial;
+        lastPickedTweet.circle.material = circleMaterial;
 
         self.infoUI.removePanel(self.lastPickedIdClick);
         pickedId = undefined;
